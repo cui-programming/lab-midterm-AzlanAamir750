@@ -1,24 +1,27 @@
 import React, { useState } from 'react';
 import { View, FlatList } from 'react-native';
-import { Text, Button } from '../ui';
+import { Text } from '../ui'; // ✅ use Text from ui layer
+import { Button } from '../ui'; // ✅ use Button from ui layer
 import { styles } from '../../styles/styles';
 import { initialAzkaar } from '../../data/azkaar';
 
 export default function TasbihList() {
   const [items, setItems] = useState(initialAzkaar);
 
-  const handleIncrement = (id) => {
-    setItems(prev =>
-      prev.map(item =>
+  const increment = (id) => {
+    setItems((prevItems) =>
+      prevItems.map((item) =>
         item.id === id ? { ...item, count: item.count + 1 } : item
       )
     );
   };
 
-  const handleDecrement = (id) => {
-    setItems(prev =>
-      prev.map(item =>
-        item.id === id ? { ...item, count: Math.max(0, item.count - 1) } : item
+  const decrement = (id) => {
+    setItems((prevItems) =>
+      prevItems.map((item) =>
+        item.id === id && item.count > 0
+          ? { ...item, count: item.count - 1 }
+          : item
       )
     );
   };
@@ -26,22 +29,11 @@ export default function TasbihList() {
   const renderItem = ({ item }) => (
     <View style={styles.itemRow}>
       <Text style={styles.itemName}>{item.phrase}</Text>
-      <View style={styles.counterRow}>
-        <Text style={styles.counter}>Count: {item.count}</Text>
-        <View style={styles.buttonGroup}>
-          <Button
-            title="−"
-            onPress={() => handleDecrement(item.id)}
-            style={styles.counterButton}
-            textStyle={{ fontSize: 18 }}
-          />
-          <Button
-            title="+"
-            onPress={() => handleIncrement(item.id)}
-            style={styles.counterButton}
-            textStyle={{ fontSize: 18 }}
-          />
-        </View>
+      <Text style={styles.counter}>{item.count}</Text>
+
+      <View style={{ flexDirection: 'row', gap: 10 }}>
+        <Button onPress={() => increment(item.id)}>+</Button>
+        <Button onPress={() => decrement(item.id)}>-</Button>
       </View>
     </View>
   );
@@ -53,7 +45,6 @@ export default function TasbihList() {
         data={items}
         keyExtractor={(it) => it.id.toString()}
         renderItem={renderItem}
-        showsVerticalScrollIndicator={false}
       />
     </View>
   );
